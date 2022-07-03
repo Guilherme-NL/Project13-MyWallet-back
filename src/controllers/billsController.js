@@ -5,16 +5,7 @@ import { db } from "../dbStrategy/mongo.js";
 const day = dayjs().format("DD/MM");
 
 export async function getBills(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  console.log(token);
-
-  const session = await db.collection("sessions").findOne({ token });
-  console.log(session);
-
-  if (!session) {
-    return res.sendStatus(401);
-  }
+  const session = res.locals.session;
 
   const bills = await db
     .collection("bills")
@@ -27,8 +18,7 @@ export async function getBills(req, res) {
 
 export async function postBills(req, res) {
   const { value, description } = req.body;
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
+  const session = res.locals.session;
 
   //Validation joi
   const CapitalSchema = joi.object({
@@ -41,12 +31,6 @@ export async function postBills(req, res) {
   if (error) {
     res.sendStatus(400);
     return;
-  }
-
-  const session = await db.collection("sessions").findOne({ token });
-
-  if (!session) {
-    return res.sendStatus(401);
   }
 
   await db
