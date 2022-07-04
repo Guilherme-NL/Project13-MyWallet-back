@@ -81,3 +81,11 @@ export async function postLogin(req, res) {
 
   res.status(200).send({ token, name: userValidation.name });
 }
+
+export async function postLogout(req, res) {
+  const session = res.locals.session;
+
+  await db.collection("sessions").deleteOne(session);
+
+  res.sendStatus(200);
+}
